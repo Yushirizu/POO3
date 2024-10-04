@@ -1,8 +1,6 @@
 package cuvevide;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 
 public class View extends Thread {
@@ -11,9 +9,9 @@ public class View extends Thread {
     private JTextField textField2;
     private JPanel panel;
     private JTextField textField3;
-    private JButton refreshButton;
-    public Process process = new Process();
-    public JFrame frame = new JFrame("View");
+    private JButton stopButton;
+    private Process process = new Process();
+    private final JFrame frame = new JFrame("View");
 
     public void creatUi() {
         frame.setContentPane(panel);
@@ -22,20 +20,21 @@ public class View extends Thread {
         frame.pack();
         frame.setSize(500, 500);
         frame.setVisible(true);
-        startButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        startButton.addActionListener(_ -> {
+            if(process.getState()== State.NEW){
                 process.start();
+            }
+            else if(process.getState()== State.TERMINATED){
+                process = new Process();
+                process.start();
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Process already started");
             }
         });
         panel.addFocusListener(new FocusAdapter() {
         });
-        refreshButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                refreshUi();
-            }
-        });
+        stopButton.addActionListener(_ -> process.interrupt());
     }
 
     public void refreshUi() {
@@ -50,6 +49,14 @@ public class View extends Thread {
     @Override
     public void run() {
         creatUi();
+        while (true) {
+            refreshUi();
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public View() {
