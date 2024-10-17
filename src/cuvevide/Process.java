@@ -1,33 +1,36 @@
 package cuvevide;
 
 public class Process extends Thread {
-    public long delay = 5000;
-    public Aspiration aspirationThread = new Aspiration(delay);
-    public Repressurisation repressurisationThread = new Repressurisation(delay);
+    private static final long DELAY = 50;
+    public Aspiration aspirationThread = new Aspiration(DELAY);
+    public boolean force = false;
+    public Repressurisation repressurisationThread = new Repressurisation(DELAY, force);
+    public Pression pressionThread = new Pression();
 
     @Override
     public void run() {
-        aspirationThread.start();
+        super.run();
         try {
+            pressionThread.start();
+            aspirationThread.start();
             aspirationThread.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
-        System.out.println("Aspiration terminée");
+            sleep(30);
 
-        try {
-            sleep(30000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        repressurisationThread.start();
-        try {
+            repressurisationThread.start();
             repressurisationThread.join();
+            pressionThread.interrupt();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        finally {
+            repressurasationforcee();
+        }
+    }
+
+    public void repressurasationforcee(){
+        force = true;
+        repressurisationThread.start();
     }
 
     public String getProccesType() {
@@ -38,5 +41,9 @@ public class Process extends Thread {
         } else {
             return "Unknown";
         }
+    }
+
+    public void sendStop() {
+        this.interrupt();
     }
 }

@@ -21,20 +21,23 @@ public class View extends Thread {
         frame.setSize(500, 500);
         frame.setVisible(true);
         startButton.addActionListener(_ -> {
-            if(process.getState()== State.NEW){
+            if (process.getState() == Thread.State.NEW) {
                 process.start();
-            }
-            else if(process.getState()== State.TERMINATED){
-                process = new Process();
-                process.start();
-            }
-            else{
-                JOptionPane.showMessageDialog(null, "Process already started");
+            } else {
+                if (process.getState() == Thread.State.TERMINATED) {
+                    process = new Process();
+                    process.start();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Process already started");
+                }
             }
         });
         panel.addFocusListener(new FocusAdapter() {
         });
-        stopButton.addActionListener(_ -> process.interrupt());
+        stopButton.addActionListener(_ -> {
+                    process.sendStop();
+                }
+        );
     }
 
     public void refreshUi() {
@@ -43,6 +46,7 @@ public class View extends Thread {
             textField1.setText(process.aspirationThread.getName());
         else
             textField1.setText(process.repressurisationThread.getName());
+        textField2.setText(process.pressionThread.getPression() + "");
         frame.repaint();
     }
 
