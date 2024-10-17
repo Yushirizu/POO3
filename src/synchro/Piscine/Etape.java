@@ -4,20 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Etape extends JPanel {
-    private final ThBaigneur baigneur;
+    private final ThBaigneur thBaigneur;
     private final Etats etat;
     private boolean isCurrent;
     private boolean isCompleted;
 
     public Etape(ThBaigneur baigneur, Etats etat) {
-        this.baigneur = baigneur;
+        this.thBaigneur = baigneur;
         this.etat = etat;
         this.isCurrent = false;
         this.isCompleted = false;
-        setLayout(new BorderLayout());
-        setSize(100, 100);
-        setVisible(true);
-        setBackground(Color.WHITE);
     }
 
     public boolean isCurrent() {
@@ -34,5 +30,16 @@ public class Etape extends JPanel {
 
     public Etats getEtat() {
         return etat;
+    }
+
+    public Color getColor() {
+        if (isCompleted) {
+            return Color.GRAY;
+        } else if (thBaigneur.isPaused()) {
+            return Color.YELLOW;
+        } else if (isCurrent) {
+            return Color.GREEN;
+        }
+        return Color.WHITE;
     }
 }
